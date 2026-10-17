@@ -1,0 +1,30 @@
+name: Publicar proyecto Java descomprimido
+on:
+  push:
+    paths:
+      - '.github/workflows/publicar-java.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener repositorio
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Extraer proyecto Eclipse
+        run: |
+          mkdir -p "$RUNNER_TEMP/club_seneca"
+          unzip -oq ClubSeneca_Persona3_Eclipse.zip -d "$RUNNER_TEMP/club_seneca"
+          cp -a "$RUNNER_TEMP/club_seneca/ClubSeneca_JavaProject/." .
+          rm -f ClubSeneca_Persona3_Eclipse.zip
+          rm -f .github/workflows/publicar-java.yml
+      - name: Registrar fuentes en GitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Publicar clases Java abiertas y quitar ZIP"
+          git push
